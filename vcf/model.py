@@ -681,7 +681,8 @@ class _SV(_AltRecord):
 
 
 def make_calldata_tuple(fields):
-    """ Return a namedtuple for a given call format """
+    """ Return a namedtuple for a given call format. Note
+        This is the format not the data"""
 
     class CallData(collections.namedtuple('calldata', fields)):
         __slots__ = ()
@@ -689,6 +690,7 @@ def make_calldata_tuple(fields):
         _types = []
         _nums = []
 
+                    
         def __str__(self):
             dat = ", ".join(["%s=%s" % (x, y)
                 for (x, y) in zip(self._fields, self)])
@@ -699,3 +701,8 @@ def make_calldata_tuple(fields):
             return make_calldata_tuple, (fields, )
 
     return CallData
+
+# def remake_calldata_tuple(oldCallData, newList):
+#     """ Need to make format with new data to add """
+#     pdb.set_trace()
+#     return make_calldata_tuple()

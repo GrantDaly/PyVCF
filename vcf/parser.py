@@ -248,6 +248,7 @@ class Reader(object):
             'strict_whitespace=True' will split records on tabs only (as with VCF
             spec) which allows you to parse files with spaces in the sample names.
         """
+        print("updated ")
         super(Reader, self).__init__()
 
         if not (fsock or filename):
@@ -430,9 +431,11 @@ class Reader(object):
 
     def _parse_sample_format(self, samp_fmt):
         """ Parse the format of the calls in this _Record """
+        
         samp_fmt = make_calldata_tuple(samp_fmt.split(':'))
 
         for fmt in samp_fmt._fields:
+            
             try:
                 entry_type = self.formats[fmt].type
                 entry_num = self.formats[fmt].num
@@ -513,7 +516,7 @@ class Reader(object):
                     sampdat[i] = _map(float, vals)
                 else:
                     sampdat[i] = vals
-
+                
             # create a call object
             call = _Call(site, name, samp_fmt(*sampdat))
             samp_data.append(call)
