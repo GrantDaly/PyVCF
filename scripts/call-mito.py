@@ -1,11 +1,16 @@
 import vcf
 import gzip
 import pdb
+import sys
 # raw_variants = vcf.Reader(open('variants/grouped/grouped.ncbiformat.vcf'))
 #pdb.set_trace()
 #from vcf.model import remake_calldata_tuple
 from vcf.model import _Call
-raw_variants = vcf.Reader(filename='../../variants/grouped/norm.altsOnly.vcf.gz')
+
+infile = sys.argv[1]
+outfile = sys.argv[2]
+
+raw_variants = vcf.Reader(filename=infile)
 
 # to add info tag for AF (aka VF?)
 #raw_variants.infos['HOB']
@@ -14,7 +19,7 @@ raw_variants = vcf.Reader(filename='../../variants/grouped/norm.altsOnly.vcf.gz'
 # todo, call _parse_sample_format
 raw_variants.formats['AF'] = vcf.parser._Info(id="AF", num=1, type="Float", desc="Allele frequencyfor individual (named inconsistently in literature for site/sample aka VD",source=None, version=None)
 # use modified raw_variants as template
-vcf_writer = vcf.Writer(open('../../variants/grouped/calls-norm.vcf', 'w'), raw_variants)
+vcf_writer = vcf.Writer(open(outfile, 'w'), raw_variants)
 
  
 for record in raw_variants:
@@ -27,6 +32,7 @@ for record in raw_variants:
     #record.FORMAT = ":".join([record.FORMAT,"AF"])
     oldFormat = record.FORMAT
 
+    
     record.add_format("AF")
 
 
@@ -41,6 +47,9 @@ for record in raw_variants:
         
         tempTuple = sample_call.data
 
+        #if(len(tempTuple.AD) > 2):
+        #    pdb.set_trace()
+
         # add AF
         refCount = tempTuple.AD[0]
         varCount = tempTuple.AD[1]
@@ -54,11 +63,18 @@ for record in raw_variants:
 
         # eventually may add "FT" for genotype filter
 
+        newGT = "0/0"
         # call preliminary genotype
         if(totalBases >= 100):
             if((tempAF > 0.01) and (tempAF < 0.99)):
                 newGT = "0/1"
             elif(tempAF >= 0.99):
+                newGT = "1/1"
+            else:
+                newGT = "0/0"
+        elif((totalBases < 100) and (totalBases >= 10)):
+            # if the total bases is less than 100 we allow homoplasmies
+            if(tempAF >= 0.99):
                 newGT = "1/1"
             else:
                 newGT = "0/0"
