@@ -65,7 +65,7 @@ for record in raw_variants:
 
         newGT = "0/0"
         # call preliminary genotype
-        if(totalBases >= 100):
+        if(totalBases >= 500):
             if((tempAF > 0.01) and (tempAF < 0.99)):
                 newGT = "0/1"
             elif(tempAF >= 0.99):
